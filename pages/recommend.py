@@ -159,7 +159,15 @@ def input_selection(selected_collections):
                 model_input_contract_address.append(selected_collections[int(num)-1])
         if st.button("선택 완료"):
             print(model_input_contract_address)
-            st.write('You selected: ', model_input_contract_address)
+            st.write('You selected: ')
+
+            st.write(", ".join(model_input_contract_address))
+
+            # for i in model_input_contract_address:
+            #     st.write(i)
+            # lambda(x:st.write(x), model_input_contract_address)
+
+            
             request_model_result(model_input_contract_address)
 
             #return model_input_contract_address
@@ -187,7 +195,11 @@ def request_model_result(model_input):
         print("응답 데이터:", response.json())
         recommendation_result = response.json()['recommendations']
 
-        st.write(recommendation_result[0])
+        st.write('Recommendation results: ')
+        st.write(", ".join(recommendation_result))
+        # for i in recommendation_result:
+        #     st.write(i)
+        
         return recommendation_result
     
     else:
