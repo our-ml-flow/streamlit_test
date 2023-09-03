@@ -36,4 +36,4 @@ if __name__ == '__main__':
     st.header('일자별 거래 현황', divider='rainbow')
 
     d = st.date_input("원하는 날짜를 선택하세요", datetime.today()- timedelta(1))
-    st.write('Your birthday is:', d)
+    st.write('You choose :', d)

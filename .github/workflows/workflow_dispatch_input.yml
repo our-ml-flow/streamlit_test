@@ -1,4 +1,4 @@
-name: App CI / CD
+name: Streamlit
 
 on:
   workflow_dispatch:
@@ -6,17 +6,8 @@ on:
       repository:
         description: 'Input Docker Repository name to deploy to'
         required: true
-        default: 'app'
+        default: 'streamlit'
         
-      deploy_path:
-        description: 'Input path to deploy to'
-        required: true
-        default: 'flow/'
-
-      deploy_file:
-        description: 'Input file to deploy to'
-        required: true
-        default: ''
 
       docker_tag:
         description: 'Input dockerfile tag to deploy to'

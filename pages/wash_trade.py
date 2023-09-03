@@ -131,7 +131,7 @@ def make_pie_chart_for_wash_trade(trade_df, wash_trade_df):
 
     percent_wash_trade_df = pd.DataFrame({ 'type':['정상 거래', '비정상 거래'],
                                             'amount':[(len(trade_df)-len(wash_trade_df)), len(wash_trade_df)]})
-
+    #plt.pie(percent_wash_trade_df['amount'], labels=percent_wash_trade_df['type'], autopct='%.1f%%')
     fig = px.pie(percent_wash_trade_df, values='amount', names='type', title='전체 거래량 대비 비정상 비율', color_discrete_sequence=px.colors.sequential.Bluered_r)
     fig = fig.update_traces(textposition='inside', textinfo='percent+label+value+text')
 
@@ -161,9 +161,17 @@ def make_wash_trade_amount_graph(trade_df, wash_trade_df):
     trade_count_df.plot(kind='barh', figsize=(10,6), stacked=True, alpha=0.7)
 
     fig = px.bar(trade_count_df, x=['비정상 거래 비율', '정상 거래 비율'], y='market', title="market별 전체 거래량 대비 비정상 거래 비율", orientation='h', barmode='stack', color_discrete_sequence=px.colors.sequential.Bluered_r)
-
+    # fig.show()
+    # fig = px.bar(trade_count_df, x="wash_trade_ratio", y="market", color='day', orientation='h',
+    #          hover_data=["normal_ratio", "size"],
+    #          height=400,
+    #          title='전체 거래량 대비 wash trade 거래 비율')
+    
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
+    
+    
+    # st.text(market_list)
 
 
 # wash trade 데이터에 dune_nft_metadata의 collection name 연결하기
@@ -181,7 +189,7 @@ def add_collection_name(wash_trade_df, metadata_df):
     collection_freq_counts= wash_trade_metadata_df['name'].value_counts().reset_index()
     top_10_collection_freq = collection_freq_counts.head(10)
     top_10_collection_freq = top_10_collection_freq.sort_values(by='count', ascending=True)
-
+    #st.bar_chart(top_10_collection_freq)
     fig = px.bar(top_10_collection_freq, x="count", y="name", title="거래 빈도 상위 10개 collection", color='count',  color_continuous_scale = 'amp', orientation='h')
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
