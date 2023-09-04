@@ -184,13 +184,16 @@ def add_collection_name(wash_trade_df, metadata_df):
     wash_trade_metadata_df['address'] = wash_trade_metadata_df['address'].fillna('None')
     wash_trade_metadata_df['name'] = wash_trade_metadata_df['name'].fillna('None')
 
+    wash_trade_metadata_df = wash_trade_metadata_df[wash_trade_metadata_df['address'] != 'None']
+    wash_trade_metadata_df = wash_trade_metadata_df[wash_trade_metadata_df['name'] != 'None']
+
 
     # 빈도 계산
     collection_freq_counts= wash_trade_metadata_df['name'].value_counts().reset_index()
     top_10_collection_freq = collection_freq_counts.head(10)
     top_10_collection_freq = top_10_collection_freq.sort_values(by='count', ascending=True)
     #st.bar_chart(top_10_collection_freq)
-    fig = px.bar(top_10_collection_freq, x="count", y="name", title="거래 빈도 상위 10개 collection", color='count',  color_continuous_scale = 'amp', orientation='h')
+    fig = px.bar(top_10_collection_freq, x="count", y="name", title="거래 빈도 상위 10개 collection", color='count',  color_continuous_scale = 'Bluered', orientation='h')
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 

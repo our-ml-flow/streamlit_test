@@ -51,13 +51,13 @@ def recommend():
 def wallet_exist():
 
     st.write("본인 소유의 지갑이 있다면 지갑 주소를 적어주세요")
-    user_wallet_address = st.text_input(label="User Wallet Address", value="default value")
+    user_wallet_address = st.text_input(label="User Wallet Address", placeholder="default value")
     
     # 지갑 주소가 입력되면 가진 컬렉션 조회해 추천 모델에 전달
     if st.button("입력"):
-        con = st.container()
-        con.caption("지갑 주소")
-        con.write(f"Your Wallet Address : {str(user_wallet_address)}")
+        #con = st.container()
+        #con.caption("지갑 주소")
+        #con.write(f"Your Wallet Address : {str(user_wallet_address)}")
 
         ## 변경 쿼리
         search_wallet_query = """ 
@@ -83,7 +83,9 @@ def wallet_exist():
         wallet_exist_model_df = wallet_info_num_top_n_df[:3]
         
         wallet_exist_model_input = list(wallet_exist_model_df['collection_name'])
-        st.write(wallet_exist_model_input)
+        st.markdown('## Your collections')
+
+        st.write(", ".join(wallet_exist_model_input))
 
         # 데이터프레임을 기반으로 파이 차트 그리기
         # fig = px.pie(wallet_info_num_top_n_df, values='count', names='collection_name', title='컬렉션 별 보유 NFT 수 Top 5')
@@ -97,16 +99,16 @@ def wallet_exist():
 
 
 
-@st.cache_data(experimental_allow_widgets=True, ttl=120)
+@st.cache_data(experimental_allow_widgets=True)
 def wallet_no_exist():
     print(f'reload :{time.time}')
     
     list_image_choice = make_df()
 
-    st.write("본인 소유의 지갑이 없다면 원하는 컬렉션을 선택해주세요")
+    # st.write("본인 소유의 지갑이 없다면 원하는 컬렉션을 선택해주세요")
 
-    con = st.container()
-    con.caption("원하는 컬렉션 3개를 선택하세요")
+    # con = st.container()
+    # con.caption("원하는 컬렉션 3개를 선택하세요")
 
     selected_items = random.choices(list_image_choice, k=5)
 
@@ -159,7 +161,7 @@ def input_selection(selected_collections):
                 model_input_contract_address.append(selected_collections[int(num)-1])
         if st.button("선택 완료"):
             print(model_input_contract_address)
-            st.write('You selected: ')
+            st.markdown('## Your collections')
 
             st.write(", ".join(model_input_contract_address))
 
@@ -195,7 +197,7 @@ def request_model_result(model_input):
         print("응답 데이터:", response.json())
         recommendation_result = response.json()['recommendations']
 
-        st.write('Recommendation results: ')
+        st.markdown('## Recommendation results')
         st.write(", ".join(recommendation_result))
         # for i in recommendation_result:
         #     st.write(i)
@@ -223,7 +225,17 @@ if __name__ == '__main__':
         #request_model_result(wallet_exist_model_input)
 
     with tab2:
-        selected_collections = wallet_no_exist()
+        st.write("본인 소유의 지갑이 없다면 원하는 컬렉션 3개 선택해주세요")
+
+        con = st.container()
+        con.caption("원하는 컬렉션이 없다면 reload를 눌러주세요")
+        #selected_collections = wallet_no_exist()
+
+        if st.button("Reload"):
+            st.cache_data.clear()
+            selected_collections = wallet_no_exist()
+        else:
+            selected_collections = wallet_no_exist()
 
         # model_input_contract_address = input_selection(selected_collections)
         input_selection(selected_collections)
