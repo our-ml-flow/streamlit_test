@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 import time
+import os
 
 # DB 연결
 @st.cache_resource
@@ -204,9 +205,53 @@ def add_collection_name(wash_trade_df, metadata_df):
 
 @st.cache_resource
 def load_data():
-    # engine = init_connection()
+    engine = init_connection()
 
     start_time = time.time()
+
+    if os.path.isfile("june_wash_trade_df.csv") == True:
+        june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+
+    elif os.path.isfile("june_wash_trade_df.csv") == False:
+        june_wash_trade_df = load_june_wash_trade_data(engine)
+        june_wash_trade_df.to_csv("june_wash_trade_df.csv",sep=',')
+        june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+
+
+    if os.path.isfile("june_trade_df.csv") == True:
+        june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+
+    elif os.path.isfile("june_trade_df.csv") == False:
+        june_trade_df = load_june_trade_data(engine)
+        june_trade_df.to_csv("june_trade_df.csv",sep=',')
+        june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+
+    if os.path.isfile("july_wash_trade_df.csv") == True:
+        july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+
+    elif os.path.isfile("july_wash_trade_df.csv") == False:
+        july_wash_trade_df = load_july_wash_trade_data(engine)
+        july_wash_trade_df.to_csv("july_wash_trade_df.csv",sep=',')
+        july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+
+    if os.path.isfile("july_trade_df.csv") == True:
+        july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+
+    elif os.path.isfile("july_trade_df.csv") == False:
+        july_trade_df = load_july_trade_data(engine)
+        july_trade_df.to_csv("july_trade_df.csv",sep=',')
+        july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+
+    if os.path.isfile("metadata_df.csv") == True:
+        metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+        
+    elif os.path.isfile("metadata_df.csv") == False:
+        metadata_df = load_nft_metadata(engine)
+        metadata_df.to_csv("metadata_df.csv",sep=',')
+        metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+
+
+    #start_time = time.time()
     # read_sql로 데이터 호출해 가져옴
     # june_wash_trade_df = load_june_wash_trade_data(engine)
     # june_trade_df = load_june_trade_data(engine)
@@ -222,11 +267,11 @@ def load_data():
     # metadata_df.to_csv("metadata_df.csv",sep=',')
 
     # 이미 저장된 csv를 read_csv만 함
-    june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
-    june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
-    july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
-    july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
-    metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+    # june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+    # june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+    # july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+    # july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+    # metadata_df = pd.read_csv("metadata_df.csv",sep=',')
 
     end_time = time.time()
 
