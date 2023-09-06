@@ -7,6 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+import time
+
 # DB 연결
 @st.cache_resource
 def init_connection():
@@ -202,14 +204,33 @@ def add_collection_name(wash_trade_df, metadata_df):
 
 @st.cache_resource
 def load_data():
-    engine = init_connection()
+    # engine = init_connection()
 
-    # 데이터 호출
-    june_wash_trade_df = load_june_wash_trade_data(engine)
-    june_trade_df = load_june_trade_data(engine)
-    july_wash_trade_df = load_july_wash_trade_data(engine)
-    july_trade_df = load_july_trade_data(engine)
-    metadata_df = load_nft_metadata(engine)
+    start_time = time.time()
+    # read_sql로 데이터 호출해 가져옴
+    # june_wash_trade_df = load_june_wash_trade_data(engine)
+    # june_trade_df = load_june_trade_data(engine)
+    # july_wash_trade_df = load_july_wash_trade_data(engine)
+    # july_trade_df = load_july_trade_data(engine)
+    # metadata_df = load_nft_metadata(engine)
+
+    # read_sql로 읽어와서 to_csv 저장 후, read_csv로 읽어서 가져옴
+    # june_wash_trade_df.to_csv("june_wash_trade_df.csv",sep=',')
+    # june_trade_df.to_csv("june_trade_df.csv",sep=',')
+    # july_wash_trade_df.to_csv("july_wash_trade_df.csv",sep=',')
+    # july_trade_df.to_csv("july_trade_df.csv",sep=',')
+    # metadata_df.to_csv("metadata_df.csv",sep=',')
+
+    # 이미 저장된 csv를 read_csv만 함
+    june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+    june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+    july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+    july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+    metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+
+    end_time = time.time()
+
+    print(f"로드 소요 시간 : {end_time-start_time}")
 
     return june_wash_trade_df, june_trade_df, july_wash_trade_df, july_trade_df, metadata_df
 
