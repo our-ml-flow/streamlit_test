@@ -7,6 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+import time
+import os
+
 # DB 연결
 @st.cache_resource
 def init_connection():
@@ -131,7 +134,7 @@ def make_pie_chart_for_wash_trade(trade_df, wash_trade_df):
 
     percent_wash_trade_df = pd.DataFrame({ 'type':['정상 거래', '비정상 거래'],
                                             'amount':[(len(trade_df)-len(wash_trade_df)), len(wash_trade_df)]})
-
+    #plt.pie(percent_wash_trade_df['amount'], labels=percent_wash_trade_df['type'], autopct='%.1f%%')
     fig = px.pie(percent_wash_trade_df, values='amount', names='type', title='전체 거래량 대비 비정상 비율', color_discrete_sequence=px.colors.sequential.Bluered_r)
     fig = fig.update_traces(textposition='inside', textinfo='percent+label+value+text')
 
@@ -161,9 +164,17 @@ def make_wash_trade_amount_graph(trade_df, wash_trade_df):
     trade_count_df.plot(kind='barh', figsize=(10,6), stacked=True, alpha=0.7)
 
     fig = px.bar(trade_count_df, x=['비정상 거래 비율', '정상 거래 비율'], y='market', title="market별 전체 거래량 대비 비정상 거래 비율", orientation='h', barmode='stack', color_discrete_sequence=px.colors.sequential.Bluered_r)
-
+    # fig.show()
+    # fig = px.bar(trade_count_df, x="wash_trade_ratio", y="market", color='day', orientation='h',
+    #          hover_data=["normal_ratio", "size"],
+    #          height=400,
+    #          title='전체 거래량 대비 wash trade 거래 비율')
+    
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
+    
+    
+    # st.text(market_list)
 
 
 # wash trade 데이터에 dune_nft_metadata의 collection name 연결하기
@@ -176,13 +187,16 @@ def add_collection_name(wash_trade_df, metadata_df):
     wash_trade_metadata_df['address'] = wash_trade_metadata_df['address'].fillna('None')
     wash_trade_metadata_df['name'] = wash_trade_metadata_df['name'].fillna('None')
 
+    wash_trade_metadata_df = wash_trade_metadata_df[wash_trade_metadata_df['address'] != 'None']
+    wash_trade_metadata_df = wash_trade_metadata_df[wash_trade_metadata_df['name'] != 'None']
+
 
     # 빈도 계산
     collection_freq_counts= wash_trade_metadata_df['name'].value_counts().reset_index()
     top_10_collection_freq = collection_freq_counts.head(10)
     top_10_collection_freq = top_10_collection_freq.sort_values(by='count', ascending=True)
-
-    fig = px.bar(top_10_collection_freq, x="count", y="name", title="거래 빈도 상위 10개 collection", color='count',  color_continuous_scale = 'amp', orientation='h')
+    #st.bar_chart(top_10_collection_freq)
+    fig = px.bar(top_10_collection_freq, x="count", y="name", title="거래 빈도 상위 10개 collection", color='count',  color_continuous_scale = 'Bluered', orientation='h')
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 
@@ -193,12 +207,52 @@ def add_collection_name(wash_trade_df, metadata_df):
 def load_data():
     engine = init_connection()
 
-    # 데이터 호출
-    june_wash_trade_df = load_june_wash_trade_data(engine)
-    june_trade_df = load_june_trade_data(engine)
-    july_wash_trade_df = load_july_wash_trade_data(engine)
-    july_trade_df = load_july_trade_data(engine)
-    metadata_df = load_nft_metadata(engine)
+    start_time = time.time()
+
+    if os.path.isfile("june_wash_trade_df.csv") == True:
+        june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+
+    elif os.path.isfile("june_wash_trade_df.csv") == False:
+        june_wash_trade_df = load_june_wash_trade_data(engine)
+        june_wash_trade_df.to_csv("june_wash_trade_df.csv",sep=',')
+        june_wash_trade_df = pd.read_csv("june_wash_trade_df.csv",sep=',')
+
+
+    if os.path.isfile("june_trade_df.csv") == True:
+        june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+
+    elif os.path.isfile("june_trade_df.csv") == False:
+        june_trade_df = load_june_trade_data(engine)
+        june_trade_df.to_csv("june_trade_df.csv",sep=',')
+        june_trade_df = pd.read_csv("june_trade_df.csv",sep=',')
+
+    if os.path.isfile("july_wash_trade_df.csv") == True:
+        july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+
+    elif os.path.isfile("july_wash_trade_df.csv") == False:
+        july_wash_trade_df = load_july_wash_trade_data(engine)
+        july_wash_trade_df.to_csv("july_wash_trade_df.csv",sep=',')
+        july_wash_trade_df = pd.read_csv("july_wash_trade_df.csv",sep=',')
+
+    if os.path.isfile("july_trade_df.csv") == True:
+        july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+
+    elif os.path.isfile("july_trade_df.csv") == False:
+        july_trade_df = load_july_trade_data(engine)
+        july_trade_df.to_csv("july_trade_df.csv",sep=',')
+        july_trade_df = pd.read_csv("july_trade_df.csv",sep=',')
+
+    if os.path.isfile("metadata_df.csv") == True:
+        metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+        
+    elif os.path.isfile("metadata_df.csv") == False:
+        metadata_df = load_nft_metadata(engine)
+        metadata_df.to_csv("metadata_df.csv",sep=',')
+        metadata_df = pd.read_csv("metadata_df.csv",sep=',')
+
+    end_time = time.time()
+
+    print(f"로드 소요 시간 : {end_time-start_time}")
 
     return june_wash_trade_df, june_trade_df, july_wash_trade_df, july_trade_df, metadata_df
 
@@ -233,12 +287,3 @@ if __name__ == '__main__':
 
         st.subheader('거래 주의 market', divider='red')
         make_wash_trade_amount_graph(july_trade_df, july_wash_trade_df)
-
-
-
-
-        ########
-        # 2023.09.01 
-        # - metadata에 있는 Null값에 대해 추가 데이터 수집 예정
-        # - wash trade가 무엇인지에 대한 설명 추가 필요
-        ########
